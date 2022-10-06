@@ -385,14 +385,19 @@ static const struct display_driver_api stm32_ltdc_display_api = {
 #define FRAME_BUFFER_SECTION
 #endif /* DT_INST_NODE_HAS_PROP(0, ext_sdram) */
 
+#define FRAME_BUFFER_WIDTH 480
+#define FRAME_BUFFER_HEIGHT 320
+#define FRAME_BUFFER_X_START 80
+#define FRAME_BUFFER_Y_START 80
+
 #define STM32_LTDC_DEVICE(inst)									\
 	PINCTRL_DT_INST_DEFINE(inst);								\
 	PM_DEVICE_DT_INST_DEFINE(inst, stm32_ltdc_pm_action);					\
 	/* frame buffer aligned to cache line width for optimal cache flushing */		\
 	FRAME_BUFFER_SECTION static uint8_t __aligned(32)					\
 				frame_buffer_##inst[STM32_LTDC_INIT_PIXEL_SIZE *		\
-						DT_INST_PROP(0, height) *			\
-						DT_INST_PROP(0, width)];			\
+						FRAME_BUFFER_HEIGHT *			\
+						FRAME_BUFFER_WIDTH];			\
 	static struct display_stm32_ltdc_data stm32_ltdc_data_##inst = {			\
 		.frame_buffer = frame_buffer_##inst,						\
 		.hltdc = {									\
@@ -430,18 +435,18 @@ static const struct display_driver_api stm32_ltdc_display_api = {
 					DT_INST_PROP_OR(inst, def_back_color_blue, 0xFF),	\
 			},									\
 			.LayerCfg[0] = {							\
-				.WindowX0 = 0,							\
-				.WindowX1 = DT_INST_PROP(inst, width),				\
-				.WindowY0 = 0,							\
-				.WindowY1 = DT_INST_PROP(inst, height),				\
+				.WindowX0 = FRAME_BUFFER_X_START,							\
+				.WindowX1 = FRAME_BUFFER_X_START + FRAME_BUFFER_WIDTH,				\
+				.WindowY0 = FRAME_BUFFER_Y_START,							\
+				.WindowY1 = FRAME_BUFFER_Y_START + FRAME_BUFFER_HEIGHT,				\
 				.PixelFormat = STM32_LTDC_INIT_PIXEL_FORMAT,			\
 				.Alpha = 255,							\
 				.Alpha0 = 0,							\
 				.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA,			\
 				.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA,			\
 				.FBStartAdress = (uint32_t) frame_buffer_##inst,		\
-				.ImageWidth = DT_INST_PROP(inst, width),			\
-				.ImageHeight = DT_INST_PROP(inst, height),			\
+				.ImageWidth = FRAME_BUFFER_WIDTH,			\
+				.ImageHeight = FRAME_BUFFER_HEIGHT,			\
 				.Backcolor.Red =						\
 					DT_INST_PROP_OR(inst, def_back_color_red, 0xFF),	\
 				.Backcolor.Green =						\
@@ -452,8 +457,8 @@ static const struct display_driver_api stm32_ltdc_display_api = {
 		},										\
 	};											\
 	static const struct display_stm32_ltdc_config stm32_ltdc_config_##inst = {		\
-		.width = DT_INST_PROP(inst, width),						\
-		.height = DT_INST_PROP(inst, height),						\
+		.width = FRAME_BUFFER_WIDTH,						\
+		.height = FRAME_BUFFER_HEIGHT,						\
 		.disp_on_gpio = COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, disp_on_gpios),		\
 				(GPIO_DT_SPEC_INST_GET(inst, disp_on_gpios)), ({ 0 })),		\
 		.bl_ctrl_gpio = COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, bl_ctrl_gpios),		\
