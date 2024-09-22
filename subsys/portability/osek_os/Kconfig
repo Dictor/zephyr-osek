@@ -1,0 +1,31 @@
+# Copyright (c) 2024 Jeonghyun Kim <kimdictor@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+
+config OSEK_OS
+	bool "OSEK OS API"
+	depends on INIT_STACKS
+	help
+	  This enables OSEK/VDX OS 2.2.3 API support.
+
+if OSEK_OS
+config OSEK_OS_MAX_TASK_COUNT
+	int "Maximum task count in OSEK OS API"
+	default 10
+	range 0 $(UINT8_MAX)
+	help
+	  Only below count of task can be defined and used in OSEK OS API
+
+config OSEK_OS_MAX_RESOURCE_COUNT
+	int "Maximum resource count in OSEK OS API"
+	default 10
+	range 0 $(UINT8_MAX)
+	help
+	  Only below count of resource can be defined and used in OSEK OS API
+
+config OSEK_OS_MAX_ALARM_COUNT
+	int "Maximum alarm count in OSEK OS API"
+	default 10
+	range 0 $(UINT8_MAX)
+	help
+	  Only below count of alarm can be defined and used in OSEK OS API
+endif
